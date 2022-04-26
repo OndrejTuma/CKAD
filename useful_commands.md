@@ -203,7 +203,15 @@ kubectl run <name> --image=<image> [options]
 #### Options
 
 - `--env="<key>=<value>"`
+  - Environment variables to set in the container
+- `--expose`
+  - If true, create a ClusterIP service associated with the pod
+  - Requires `--port`
+- `-l, --labels="<labels>"`
+  - Comma separated labels to apply to the pod
+  - Will override previous values
 - `--port=<port>`
+  - The port that this container exposes
 
 ### Scale
 
