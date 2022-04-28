@@ -345,7 +345,35 @@ spec:
             secretKeyRef:
               name: secret-name
               key: BAZ
+      readinessProbe: # K8s sets POD to ready state when the api responds with 200 status
+        httpGet: # For http test (web apps)
+          path: /api/ready
+          port: 8080
+        tcpSocket: # For tcp test (databases)
+          port: 3306
+        exec: # For executing command
+          command:
+            - cat
+            - /app/is_ready
+        initialDelaySeconds: 10 # how long to wait until probe
+        periodSeconds: 5 # how often to probe
+        failureThreshold: 8 # how many times to attempt to probe (default 3)
+      livenessProbe: # check if application in the POD is running properly
+        # same API as in readinessProbe
 ``` 
+
+#### Lifecycle
+
+**Status:**
+
+Pending - ContainerCreating - Running
+
+#### Conditions
+
+- PodScheduled
+- Initialized
+- ContainersReady
+- Ready
 
 ### ReplicaSet
 ### Deployment
