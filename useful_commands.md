@@ -150,8 +150,17 @@ kubectl get <object> [options]
 
 #### Options
 
+- `--selector, -l <key>=<value>,<key2>=<value2>`
 - `--namespace, -n`
 - `--show-labels`
+
+#### Example
+
+Get number of pods in dev env
+
+```shell
+kubectl get pods -l env=dev --no-headers | wc -l
+```
 
 ### Label
 
@@ -174,7 +183,7 @@ kubectl label node node1 size=Large
 Show logs from a POD. Can target specific container in the POD
 
 ```shell
-kubectl logs <pod-name> [options]
+kubectl logs <pod-name> [<pod-container>] [options]
 ```
 
 #### Options
