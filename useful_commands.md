@@ -203,6 +203,39 @@ Replace running object with definition file
 kubectl replace -f definition.yml
 ```
 
+### Rollout
+
+Rollout command of deployment.
+
+#### History
+
+Shows history of rollouts for deployment
+
+```shell
+kubectl rollout history deployment <name> [options]
+```
+
+Options:
+
+- `--revision` - check the status of each revision individually
+
+
+#### Status
+
+Shows status of current rollout
+
+```shell
+kubectl rollout status deployment <name>
+```
+
+#### Undo
+
+Rollback of deployment
+
+```shell
+kubectl rollout undo deployment <name>
+```
+
 ### Run
 
 ```shell
@@ -221,6 +254,38 @@ kubectl run <name> --image=<image> [options]
   - Will override previous values
 - `--port=<port>`
   - The port that this container exposes
+
+### Set
+
+```shell
+kubectl set <subcommand> <object> <name> <key>=<value> [options]
+```
+
+#### subcommand
+
+- `env` - Update environment variables on a pod template
+- `image` - Update the image of a pod template
+  - key=value pair represents container name and new image version
+- `resources` - Update resource requests/limits on objects with pod templates
+- `selector` - Set the selector on a resource
+- `serviceaccount` - Update the service account of a resource
+- `subject` - Update the user, group, or service account in a role binding or cluster role binding
+
+
+> TODO: play with set's capabilities and update this document accordingly
+
+#### Options
+
+- `--record` - record what is being done. Useful for `rollout history`
+
+#### Examples
+
+Update image in the deployment to `nginx:1.17` and record it.
+It will be shown in CHANGE-CAUSE column for `rollout history` command  
+
+```shell
+kubectl set image deployment nginx nginx=nginx:1.17 --record
+```
 
 ### Scale
 
@@ -386,6 +451,22 @@ Pending - ContainerCreating - Running
 
 ### ReplicaSet
 ### Deployment
+
+Whenever new deployment is created or update a rollout process is created.
+That takes care of transition from one version to another
+And when rollout is created, new revision is also created.
+
+Deployment contains ReplicaSet. 
+
+When rollout or rollback it creates another ReplicaSet 
+and then based on `StrategyType` it destroys pods in old ReplicaSet 
+and creates new pods in new ReplicaSet
+
+#### Strategy types
+
+- RollingUpdate (default)
+- Recreate
+
 ### Service
 ### Namespace
 ### ResourceQuota
