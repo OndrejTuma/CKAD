@@ -353,6 +353,91 @@ but lowercase when used as an `<object>` argument.
 - replicaset = rs
 - configmap = cm
 
+### ConfigMap
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-name
+data:
+  KEY: value
+```
+
+### CronJob
+
+Runs scheduled Job
+
+```yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: reporting-cron-job
+spec:
+  schedule: '*/1 * * * *'
+  jobTemplate:
+    spec:
+      completions: 3
+      parallelism: 3
+      template:
+        spec:
+          containers: 
+            - name: reporting-tool
+              image: reporting-tool
+          restartPolicy: Never
+```
+
+### Job
+
+Executes number of pods designed to run its instructions and the exit.
+
+Outputs of the pods will be result of the instructions
+
+Works like replicaset but it does not want the pods to live forever
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: math-add-job
+spec:
+  completions: 3 # how many pods shall complete successfully
+  parallelism: 3 # by default pod are created sequentially, this will create 3 in parallel
+  template:
+    spec:
+      containers: 
+        - name: math-add
+          image: ubuntu
+          command: ['expr', '3', '+', '2']
+      restartPolicy: Never
+```
+
+### LimitRange
+
+Sets resources defaults when new Pods are created
+
+[Docs](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/)
+
+[Source](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource)
+
+```yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-limit-range
+spec:
+  limits:
+  - default:
+      memory: 512Mi
+    defaultRequest:
+      memory: 256Mi
+    type: Container
+```
+
+You can run `kubectl top` to view metrics in Pod
+
+### Namespace
+
 ### Pod
 
 ```yaml
@@ -456,10 +541,10 @@ Whenever new deployment is created or update a rollout process is created.
 That takes care of transition from one version to another
 And when rollout is created, new revision is also created.
 
-Deployment contains ReplicaSet. 
+Deployment contains ReplicaSet.
 
-When rollout or rollback it creates another ReplicaSet 
-and then based on `StrategyType` it destroys pods in old ReplicaSet 
+When rollout or rollback it creates another ReplicaSet
+and then based on `StrategyType` it destroys pods in old ReplicaSet
 and creates new pods in new ReplicaSet
 
 #### Strategy types
@@ -467,19 +552,7 @@ and creates new pods in new ReplicaSet
 - RollingUpdate (default)
 - Recreate
 
-### Service
-### Namespace
 ### ResourceQuota
-### ConfigMap
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: config-name
-data:
-  KEY: value
-```
 
 ### Secret
 
@@ -504,37 +577,15 @@ data:
   KEY: encodedvalue
 ```
 
+### Service
+
 ### ServiceAccount
 
 When created, it creates ServiceAccount object and then
-generates a token for the ServiceAccount and then 
-creates a Secret and stores the token there. Then it linkes the 
-secret to the ServiceAccount. This token can be used as a bearer token 
+generates a token for the ServiceAccount and then
+creates a Secret and stores the token there. Then it linkes the
+secret to the ServiceAccount. This token can be used as a bearer token
 for REST API requests
 
-When creating a Pod, default ServiceAccount is created for it. 
+When creating a Pod, default ServiceAccount is created for it.
 But it has limited access.
-
-### LimitRange
-
-Sets resources defaults when new Pods are created
-
-[Docs](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/)
-
-[Source](https://kubernetes.io/docs/tasks/configure-pod-container/assign-memory-resource)
-
-```yaml
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: mem-limit-range
-spec:
-  limits:
-  - default:
-      memory: 512Mi
-    defaultRequest:
-      memory: 256Mi
-    type: Container
-```
-
-You can run `kubectl top` to view metrics in Pod
