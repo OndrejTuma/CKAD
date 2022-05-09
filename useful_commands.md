@@ -403,6 +403,7 @@ metadata:
 spec:
   completions: 3 # how many pods shall complete successfully
   parallelism: 3 # by default pod are created sequentially, this will create 3 in parallel
+  backoffLimit: 10 # to prevent a Job from quitting before it succeeds
   template:
     spec:
       containers: 
@@ -578,6 +579,51 @@ data:
 ```
 
 ### Service
+
+Like a virtual server inside a node. It has its own IP address inside the cluster and that IP is called the cluster IP of the service
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  type: NodePort
+  ports:
+    - targetPort: 80 # if not provided, it is assumed to be the same as `port`
+      port: 80 # only one required
+      nodePort: 30008 # if not provided, will be allocated automatically
+  selector: # labels from the pod
+    app: myapp
+```
+
+#### NodePort
+
+Service makes an internal pod accessible on a port on a node. 
+
+NodePort as a value can range between 30000 - 32767 
+
+#### ClusterIP
+
+Service creates a virtual IP inside the cluster to enable communication between different services (set of FE servers to a set of BE servers) 
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-end
+spec:
+  type: ClusterIP # default
+  ports:
+    - targetPort: 80
+      port: 80
+  selector:
+    app: myapp
+```
+
+#### LoadBalancer
+
+Provisions a load balancer for application in supported cloud providers.
 
 ### ServiceAccount
 
