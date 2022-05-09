@@ -142,6 +142,21 @@ kubectl explain pods --recursive | less
 kubectl explain pods --recursive | grep envFrom -A3
 ```
 
+### Expose
+
+Expose a resource as a new Kubernetes service.
+
+Looks up a deployment, service, replica set, replication controller or pod by name and uses the selector for that
+resource as the selector for a new service on the specified port. A deployment or replica set will be exposed as a
+service only if its selector is convertible to a selector that service supports, i.e. when the selector contains only
+the matchLabels component. Note that if no port is specified via --port and the exposed resource has multiple ports, all
+will be re-used by the new service. Also if no labels are specified, the new service will re-use the labels from the
+resource it exposes.
+
+```shell
+kubectl expose deployment webapp-deployment --name=webapp-service --target-port=8080 --type=NodePort --port=8080
+```
+
 ### Get
 
 ```shell
@@ -601,7 +616,7 @@ spec:
 
 Service makes an internal pod accessible on a port on a node. 
 
-NodePort as a value can range between 30000 - 32767 
+nodePort as a value can range between 30000 - 32767 
 
 #### ClusterIP
 
