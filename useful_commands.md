@@ -146,12 +146,18 @@ kubectl explain pods --recursive | grep envFrom -A3
 
 Expose a resource as a new Kubernetes service.
 
-Looks up a deployment, service, replica set, replication controller or pod by name and uses the selector for that
-resource as the selector for a new service on the specified port. A deployment or replica set will be exposed as a
-service only if its selector is convertible to a selector that service supports, i.e. when the selector contains only
-the matchLabels component. Note that if no port is specified via --port and the exposed resource has multiple ports, all
-will be re-used by the new service. Also if no labels are specified, the new service will re-use the labels from the
-resource it exposes.
+Looks up a deployment, service, replica set, 
+replication controller or pod by name 
+and uses the selector for that resource 
+as the selector for a new service on the specified port. 
+A deployment or replica set will be exposed as a service 
+only if its selector is convertible to a selector 
+that service supports, i.e. when the selector contains only
+the matchLabels component. Note that if no port is 
+specified via --port and the exposed resource has 
+multiple ports, all will be re-used by the new service. 
+Also if no labels are specified, the new service 
+will re-use the labels from the resource it exposes.
 
 ```shell
 kubectl expose deployment webapp-deployment --name=webapp-service --target-port=8080 --type=NodePort --port=8080
@@ -362,13 +368,9 @@ They are also reffered to as `kind` or `type`.
 The are by default PascalCase when used in configuration files or as `--type` option, 
 but lowercase when used as an `<object>` argument. 
 
-> There are also some shorthands when used as `<object>` argument:
+> There are also aliases for k8s objects
 
-- namespace = ns
-- replicaset = rs
-- configmap = cm
-
-### ConfigMap
+### ConfigMap (cm)
 
 ```yaml
 apiVersion: v1
@@ -400,6 +402,33 @@ spec:
             - name: reporting-tool
               image: reporting-tool
           restartPolicy: Never
+```
+
+### Ingress
+
+Ingress exposes HTTP and HTTPS routes from outside the cluster 
+to services within the cluster. Traffic routing is controlled 
+by rules defined on the Ingress resource.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx-example
+  rules:
+    - http:
+        paths:
+          - path: /testpath
+            pathType: Prefix
+            backend:
+              service:
+                name: test
+                port:
+                  number: 80
 ```
 
 ### Job
@@ -452,7 +481,11 @@ spec:
 
 You can run `kubectl top` to view metrics in Pod
 
-### Namespace
+### Namespace (ns)
+
+```shell
+kubectl create ns <name>
+```
 
 ### Pod
 
@@ -550,7 +583,7 @@ Pending - ContainerCreating - Running
 - ContainersReady
 - Ready
 
-### ReplicaSet
+### ReplicaSet (rs)
 ### Deployment
 
 Whenever new deployment is created or update a rollout process is created.
@@ -593,9 +626,11 @@ data:
   KEY: encodedvalue
 ```
 
-### Service
+### Service (svc)
 
-Like a virtual server inside a node. It has its own IP address inside the cluster and that IP is called the cluster IP of the service
+Like a virtual server inside a node. 
+It has its own IP address inside the cluster 
+and that IP is called the cluster IP of the service
 
 ```yaml
 apiVersion: v1
@@ -611,6 +646,8 @@ spec:
   selector: # labels from the pod
     app: myapp
 ```
+
+### ServiceAccount (sa)
 
 #### NodePort
 
@@ -644,7 +681,7 @@ Provisions a load balancer for application in supported cloud providers.
 
 When created, it creates ServiceAccount object and then
 generates a token for the ServiceAccount and then
-creates a Secret and stores the token there. Then it linkes the
+creates a Secret and stores the token there. Then it links the
 secret to the ServiceAccount. This token can be used as a bearer token
 for REST API requests
 
