@@ -487,6 +487,55 @@ You can run `kubectl top` to view metrics in Pod
 kubectl create ns <name>
 ```
 
+### NetworkPolicy
+
+Pods in K8s can communicate with each other. To set restrictions, use NetworkPolicy.
+NetworkPolicy describes what network traffic is allowed for a set of Pods
+
+**Ingress** policy set on a Pod(A) allows receiving requests from a certain Pod(s) and allows Pod(A) to send a response to the Pod(s).
+
+**Egress** means to allow Pod(A) to post requests to another Pod(s) and receive response from the Pod. 
+
+```mermaid
+WEB -> API -> DB
+```
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              name: api-pod
+          # this setup joins podSelector and namespaceSelector -> podSelector && namespaceSelector 
+          # we could set `- namespaceSelector` and achieve -> podSelector || namespaceSelector
+          namespaceSelector: # to allow communication only for certain namespace
+            matchLabels:
+              name: prod
+        - ipBlock: # to allow communication from certain IP (or IP ranges)
+            cidr: 192.168.5.10/32
+      ports:
+        - protocol: TCP
+          port: 3306
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 192.168.5.10/32
+      ports:
+        - protocol: TCP
+          port: 80
+```
+
 ### Pod
 
 ```yaml
