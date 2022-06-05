@@ -404,6 +404,23 @@ spec:
           restartPolicy: Never
 ```
 
+### Deployment
+
+Whenever new deployment is created or update a rollout process is created.
+That takes care of transition from one version to another
+And when rollout is created, new revision is also created.
+
+Deployment contains ReplicaSet.
+
+When rollout or rollback it creates another ReplicaSet
+and then based on `StrategyType` it destroys pods in old ReplicaSet
+and creates new pods in new ReplicaSet
+
+#### Strategy types
+
+- RollingUpdate (default)
+- Recreate
+
 ### Ingress
 
 Ingress exposes HTTP and HTTPS routes from outside the cluster 
@@ -487,7 +504,7 @@ You can run `kubectl top` to view metrics in Pod
 kubectl create ns <name>
 ```
 
-### NetworkPolicy
+### NetworkPolicy (netpol)
 
 Pods in K8s can communicate with each other. To set restrictions, use NetworkPolicy.
 NetworkPolicy describes what network traffic is allowed for a set of Pods
@@ -534,6 +551,32 @@ spec:
       ports:
         - protocol: TCP
           port: 80
+```
+
+### PersistentVolume (pv)
+
+PersistentVolume (PV) is a storage resource provisioned by an
+administrator. It is analogous to a node. [More info](https://kubernetes.io/docs/concepts/storage/persistent-volumes)
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-vol1
+spec:
+  # AccessModes contains all ways the volume can be mounted. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
+  accessModes:
+    - ReadWriteOnce # ReadOnlyMany, ReadWriteMany
+  capacity:
+    storage: 1Gi
+  # HostPath represents a directory on the host. Provisioned by a developer or
+  # tester. This is useful for single-node development and testing only!
+  hostPath:
+    path: /tmp/data
+  # any storage solution for the volume
+  awsElasticBlockStore:
+    volumeId: <volume-id>
+    fsType: ext4
 ```
 
 ### Pod
@@ -633,22 +676,6 @@ Pending - ContainerCreating - Running
 - Ready
 
 ### ReplicaSet (rs)
-### Deployment
-
-Whenever new deployment is created or update a rollout process is created.
-That takes care of transition from one version to another
-And when rollout is created, new revision is also created.
-
-Deployment contains ReplicaSet.
-
-When rollout or rollback it creates another ReplicaSet
-and then based on `StrategyType` it destroys pods in old ReplicaSet
-and creates new pods in new ReplicaSet
-
-#### Strategy types
-
-- RollingUpdate (default)
-- Recreate
 
 ### ResourceQuota
 
