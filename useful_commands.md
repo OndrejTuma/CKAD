@@ -577,6 +577,26 @@ spec:
   awsElasticBlockStore:
     volumeId: <volume-id>
     fsType: ext4
+  # What happens to a persistent volume when released from its claim.
+  persistentVolumeReclaimPolicy: Retain # Retain | Delete | Recycle
+    
+```
+
+### PersistentVolumeClaim (pvc)
+
+PersistentVolumeClaim is a user's request for and claim to a persistent volume.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
 ```
 
 ### Pod
