@@ -69,6 +69,25 @@ kubectl create namespace test-123 --dry-run=client -o yaml
 
 ## Commands
 
+### Config
+
+Config hold info about clusters in a kubernetes system and accounts created.
+Contexts connect user account to cluster.
+You can define specific namespace for a context (in kube config file), 
+that will be automatically used when the context is used
+
+#### See default config file:
+
+```shell
+kubectl config view
+```
+
+#### Change context:
+
+```shell
+kubectl config use-context my-context
+```
+
 ### Create
 
 #### From a command (imperative)
