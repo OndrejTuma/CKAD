@@ -69,6 +69,24 @@ kubectl create namespace test-123 --dry-run=client -o yaml
 
 ## Commands
 
+### Auth
+
+Find out what authorization level current user has 
+(find out if user has access to particular resource in the cluster)
+
+```shell
+kubectl auth can-i <action> <object>
+kubectl auth can-i create deployments
+kubectl auth can-i delete nodes
+```
+
+#### Find out permissions for other users
+
+```shell
+kubectl auth can-i <action> <object> --as <user>
+kubectl auth can-i create pods --as dev-user
+```
+
 ### Config
 
 Config hold info about clusters in a kubernetes system and accounts created.
@@ -85,7 +103,7 @@ kubectl config view
 #### Change context:
 
 ```shell
-kubectl config use-context my-context
+kubectl config use-context <context-name>
 ```
 
 ### Create
@@ -232,6 +250,16 @@ kubectl logs <pod-name> [<pod-container>] [options]
   - show logs for specific container
 - `-f, --follow` 
   - stream the logs
+
+### Proxy
+
+Proxy default kube api server with default credentials from kube config.
+The server will be exposed at a port `8001` and you can start curling the 
+server without setting up `--key` `--cert` and `--cacert`
+
+```shell
+kubectl proxy
+```
 
 ### Replace
 
@@ -717,6 +745,70 @@ Pending - ContainerCreating - Running
 ### ReplicaSet (rs)
 
 ### ResourceQuota
+
+### Role
+
+Creates a role object that can be used for authorization (RBAC)
+By default it has access to default namespace, but we can define
+another one in metadata section
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+rules:
+  - apiGroups: [""] # for core group we can leave it blank
+    resources: ["pods"]
+    verbs: ["list", "get", "create", "update", "delete"]
+    resourceNames: ["mypod"] # pods in a node that user can access
+  - apiGroups: [""]
+    resources: ["ConfigMap"]
+    verbs: ["create"]
+```
+
+#### Get roles:
+
+```shell
+kubectl get roles
+```
+
+#### Get more information about a role:
+
+```shell
+kubectl describe role <name>
+```
+
+### RoleBinding
+
+To bind created Role to a user
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devuser-developer-binding
+subjects:
+  - kind: User
+    name: dev-user
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+```
+
+#### Get role bindings:
+
+```shell
+kubectl get rolebinding
+```
+
+#### Get more information about a role binding:
+
+```shell
+kubectl describe rolebinding <name>
+```
 
 ### Secret
 
