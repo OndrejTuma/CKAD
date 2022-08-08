@@ -7,6 +7,36 @@ but lowercase when used as an `<object>` argument.
 
 > There are also aliases for k8s objects (mentioned in brackets)
 
+### ClusterRole
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-administrator
+rules:
+  - apiGroups: [""] 
+    resources: ["nodes"]
+    verbs: ["list", "get", "create", "delete"]
+```
+
+### ClusterRoleBinding
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-role-binding
+subjects:
+  - kind: User
+    name: cluster-admin
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-administrator
+  apiGroup: rbac.authorization.k8s.io
+```
+
 ### ConfigMap (cm)
 
 ```yaml
