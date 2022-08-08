@@ -378,7 +378,7 @@ kind: Role
 metadata:
   name: developer
 rules:
-  - apiGroups: [""] # for core group we can leave it blank
+  - apiGroups: [""] # for core group (v1) we can leave it blank
     resources: ["pods"]
     verbs: ["list", "get", "create", "update", "delete"]
     resourceNames: ["mypod"] # pods in a node that user can access
