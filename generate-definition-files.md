@@ -26,6 +26,14 @@ kubectl run <name> --image <image> [--labels "<labels>" --port <port> --expose] 
 kubectl create deployment <name> --image <image> --replicas <replicas> --dry-run=client -o yaml
 ```
 
+### Secret
+
+#### Create a tls secret with dry run
+
+```shell
+kubectl create secret tls <name> --key <key> --cert <cert> --dry-run=client -o yaml
+```
+
 ### Service
 
 #### Create from existing Pod
