@@ -28,6 +28,19 @@ GA is also split to preferred version and storage version described below.
 You can **find the preferred version** for particular API group
 by running `kubectl proxy 8001&` and `curl localhost:8001/apis/<api-group>`
 
+#### Enable API version for particular group
+
+Edit config file `/etc/kubernetes/manifests/kube-apiserver.yaml`:
+
+Edit flag `--runtime-config` and add group with version you want to add/change.
+
+For example: `--runtime-config=rbac.authorization.k8s.io/v1alpha1`
+
+After that kubelet will detect the new changes and will recreate the apiserver pod.
+It may take some time.
+
+> As a good practice, take a backup of that apiserver manifest file before going to make any changes.
+
 ### API resources
 
 represent objects in k8s. 
@@ -76,3 +89,14 @@ Example:
 ```shell
 kubectl convert -f nginx.yaml --output-version apps/v1
 ```
+
+### Install convert plugin
+
+1. Download the latest release version
+   1. `curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl-convert`
+2. Change permission of the file
+   1. `chmod +x kubectl-convert`
+3. Move the file to the `/usr/local/bin/` directory
+   1. `mv kubectl-convert /usr/local/bin/kubectl-convert`
+4. use the convert command
+   1. `kubectl convert -h`
