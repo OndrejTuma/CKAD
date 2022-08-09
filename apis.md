@@ -51,6 +51,10 @@ by running `kubectl explain <resource>`
 - /replicasets
 - /statefulsets
 
+#### Create new resource
+
+Check [this document](./create-new-api-resource.md)
+
 ### API verbs
 
 - list
