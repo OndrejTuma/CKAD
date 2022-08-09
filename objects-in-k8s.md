@@ -1,8 +1,8 @@
 ## Objects in Kubernetes
 
-They are also reffered to as `kind` or `type`.
+They are also referred to as `kind` or `type`.
 
-The are by default PascalCase when used in configuration files or as `--type` option,
+They are by default PascalCase when used in configuration files or as `--type` option,
 but lowercase when used as an `<object>` argument.
 
 > There are also aliases for k8s objects (mentioned in brackets)

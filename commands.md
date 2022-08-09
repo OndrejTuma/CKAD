@@ -1,5 +1,14 @@
 ## Commands
 
+### Api Resources
+
+Print the supported API resources on the server. 
+You get their shortcuts and API versions as well. 
+
+```shell
+kubectl api-resources
+```
+
 ### Auth
 
 Find out what authorization level current user has 
@@ -93,7 +102,8 @@ kubectl exec -it <pod-name> <command>
 ### Explain
 
 Shows definition of object, useful for quick
-look of how to define objects in definition file. Faster than checking the docs IMHO
+look of how to define objects in definition file. 
+Also, you can find to which API group this object (resource) belongs 
 
 ```shell
 kubectl explain <object[.<key>]> [options] 
@@ -181,6 +191,14 @@ kubectl logs <pod-name> [<pod-container>] [options]
   - show logs for specific container
 - `-f, --follow` 
   - stream the logs
+
+### Options
+
+Show list of global command-line options (applies to all commands)
+
+```shell
+kubectl options
+```
 
 ### Proxy
 
