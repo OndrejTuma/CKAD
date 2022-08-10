@@ -306,12 +306,14 @@ kubectl set image deployment nginx nginx=nginx:1.17 --record
 
 ### Scale
 
-Commands to use when we want to increase number of replicas
+Commands to use when we want to increase number of replicas.
+
+Can be used on replicasets and deployments
 
 #### From a file
 
 ```sh
-kubectl scale replicas=<number> -f definition.yml
+kubectl scale --replicas=<number> -f definition.yml
 ```
 
 #### From running object
@@ -319,7 +321,7 @@ kubectl scale replicas=<number> -f definition.yml
 `<object>` - replicaset, deployment, etc.
 
 ```sh
-kubectl scale replicas=<number> <object> <name>
+kubectl scale <object> <name> --replicas=<number>
 ```
 
 ### Taint
