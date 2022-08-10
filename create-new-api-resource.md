@@ -72,3 +72,34 @@ But this only allows to create new resource and store in ETCD datastore.
 It does not actually do anything.
 
 For that, we need to create a controller fot that object
+
+## Create a Custom Controller
+
+Its a process that runs in a loop and listens to events.
+
+GO is preferred language for building controllers.
+
+You can dockerize the controller and run it in a pod.
+
+## Operator Framework
+
+It can be used to deploy both CRD and a controller. 
+But it can do much more than that.
+
+There are many operators available on operatorhub.io
+
+One of the most popular operator is the:
+
+### ETCD operator
+
+Used to deploy and manage ETCD cluster in k8s.
+
+It has:
+
+| CRD         | Controller        |
+|-------------|-------------------|
+| EtcdCluster | ETCD controller   |
+| EtcdBackup  | Backup Operator   |
+| EtcdRestore | Restore Operator  |
+
+Backup and Restore are self-explanatory.
