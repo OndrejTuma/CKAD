@@ -87,6 +87,16 @@ and creates new pods in new ReplicaSet
 
 - RollingUpdate (default)
 - Recreate
+- Blue/Green
+  - this is not a value to set, but rather approach
+  - each new app version gets different label (version: v1, v2, etc)
+  - when its tested and ready, we switch service selector to route traffic to new version
+- Canary
+  - this is not a value to set, but rather approach
+  - each new app version has common selector for service
+  - new app version is created with only one pod or so
+  - this way we can test it while only small portion of traffic routes to it
+  - after its tested, replicas increse and old deployment is killed
 
 ### Ingress
 
