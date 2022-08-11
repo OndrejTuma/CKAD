@@ -34,6 +34,8 @@ Contexts connect user account to cluster.
 You can define specific namespace for a context (in kube config file), 
 that will be automatically used when the context is used
 
+Default config is located at `~/.kube/config`
+
 #### See default config file:
 
 ```shell
