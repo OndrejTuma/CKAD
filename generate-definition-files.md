@@ -1,9 +1,30 @@
-## Generate definition files
+# Generate definition files
 
-### Get definition from running object
+## Get definition from running object
 
 ```sh
 kubectl get <object> <name> -o yaml
+```
+
+## Generate definition file from create/run/expose command
+
+### ClusterRole
+
+#### Create with dry run
+
+```shell
+kubectl create clusterrole <name> --verb=<verbs> --resource=<resources> --dry-run=client -o yaml
+```
+
+`<verbs>` - list,get,create,delete,watch,...
+`<resources>` - nodes,pods,...
+
+### Deployment
+
+#### Create with dry run
+
+```sh
+kubectl create deployment <name> --image <image> --replicas <replicas> --dry-run=client -o yaml
 ```
 
 ### Pod
@@ -16,14 +37,6 @@ kubectl get <object> <name> -o yaml
 
 ```sh
 kubectl run <name> --image <image> [--labels "<labels>" --port <port> --expose] --dry-run=client -o yaml
-```
-
-### Deployment
-
-#### Create with dry run
-
-```sh
-kubectl create deployment <name> --image <image> --replicas <replicas> --dry-run=client -o yaml
 ```
 
 ### Secret
