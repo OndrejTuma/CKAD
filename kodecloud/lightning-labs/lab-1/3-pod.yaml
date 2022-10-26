@@ -1,0 +1,31 @@
+# WORKS!
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: time-check
+  name: time-check
+  namespace: dvl1987
+spec:
+  containers:
+  - image: busybox
+    name: time-check
+    resources: {}
+    command: ["/bin/sh", "-c"]
+    args: ["while true; do date > /opt/time/time-check.log; sleep $TIME_FREQ;done"]
+    env:
+      - valueFrom:
+          configMapKeyRef:
+            key: TIME_FREQ
+            name: time-config
+        name: TIME_FREQ
+    volumeMounts:
+      - name: myvol
+        mountPath: /opt/time
+  volumes:
+    - name: myvol
+      emptyDir: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

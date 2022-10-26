@@ -1,0 +1,23 @@
+# WORKS!
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: logger
+  name: logger
+spec:
+  containers:
+  - image: nginx:alpine
+    name: logger
+    resources: {}
+    volumeMounts:
+      - name: myvolume
+        mountPath: /var/www/nginx
+  volumes:
+    - name: myvolume
+      persistentVolumeClaim:
+        claimName: log-claim
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}

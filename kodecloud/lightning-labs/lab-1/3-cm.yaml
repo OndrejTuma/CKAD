@@ -1,0 +1,9 @@
+# WORKS!
+apiVersion: v1
+data:
+  TIME_FREQ: "10"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: time-config
+  namespace: dvl1987
