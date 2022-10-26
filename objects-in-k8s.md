@@ -9,6 +9,17 @@ but lowercase when used as an `<object>` argument.
 
 ### ClusterRole
 
+ClusterRole is a cluster level, logical grouping of PolicyRules that can be 
+referenced as a unit by a RoleBinding or ClusterRoleBinding.
+
+#### Create
+
+`kubectl create clusterrole NAME --verb=verb --resource=resource.group [--resource-name=resourcename] [--dry-run=server|client|none] [options]`
+
+#### Example
+
+`kubectl create clusterrole cluster-administrator --verb=list,get,create,delete --resource=nodes`
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -22,38 +33,72 @@ rules:
 
 ### ClusterRoleBinding
 
+ClusterRoleBinding references a ClusterRole, but not contain it. It can 
+reference a ClusterRole in the global namespace, and adds who information 
+via Subject.
+
+#### Create
+
+`kubectl create clusterrolebinding NAME --clusterrole=NAME [--user=username] [--group=groupname] [--serviceaccount=namespace:serviceaccountname] [--dry-run=server|client|none] [options]`
+
+#### Example
+
+`kubectl create clusterrolebinding cluster-admin-role-binding --clusterrole=cluster-administrator --user=cluster-admin --group=group1`
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: cluster-admin-role-binding
-subjects:
-  - kind: User
-    name: cluster-admin
-    apiGroup: rbac.authorization.k8s.io
 roleRef:
+  apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-administrator
-  apiGroup: rbac.authorization.k8s.io
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: cluster-admin
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: group1
 ```
 
 ### ConfigMap (cm)
 
+ConfigMap holds configuration data for pods to consume.
+
+#### Create
+
+`kubectl create configmap NAME [--from-file=[key=]source] [--from-literal=key1=value1] [--dry-run=server|client|none] [options]`
+
+#### Example
+
+`kubectl create cm my-map --from-literal=foo=bar --from-literal=foo1=bar1`
+
 ```yaml
 apiVersion: v1
+data:
+  foo: bar
+  foo1: bar1
 kind: ConfigMap
 metadata:
-  name: config-name
-data:
-  KEY: value
+  name: my-map
 ```
 
-### CronJob
+### CronJob (cj)
 
-Runs scheduled Job
+CronJob represents the configuration of a single cron job.
+
+#### Create
+
+`kubectl create cronjob NAME --image=image --schedule='0/5 * * * ?' -- [COMMAND] [args...] [flags] [options]`
+
+#### Example
+
+`kubectl create cj reporting-cron-job --image=reporting-tool --schedule='*/1 * * * *'`
 
 ```yaml
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: reporting-cron-job
@@ -66,7 +111,7 @@ spec:
       template:
         spec:
           containers: 
-            - name: reporting-tool
+            - name: reporting-cron-job
               image: reporting-tool
           restartPolicy: Never
 ```
