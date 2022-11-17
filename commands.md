@@ -1,5 +1,7 @@
 ## Commands
 
+See https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+
 ### Api Resources
 
 Print the supported API resources on the server. 
