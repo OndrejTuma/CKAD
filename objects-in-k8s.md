@@ -1,4 +1,4 @@
-## Objects in Kubernetes
+# Objects in Kubernetes
 
 They are also referred to as `kind` or `type`.
 
@@ -7,16 +7,16 @@ but lowercase when used as an `<object>` argument.
 
 > There are also aliases for k8s objects (mentioned in brackets)
 
-### ClusterRole
+## ClusterRole
 
 ClusterRole is a cluster level, logical grouping of PolicyRules that can be 
 referenced as a unit by a RoleBinding or ClusterRoleBinding.
 
-#### Create
+### Create
 
 `kubectl create clusterrole NAME --verb=verb --resource=resource.group [--resource-name=resourcename] [--dry-run=server|client|none] [options]`
 
-#### Example
+### Example
 
 `kubectl create clusterrole cluster-administrator --verb=list,get,create,delete --resource=nodes`
 
@@ -31,17 +31,17 @@ rules:
     verbs: ["list", "get", "create", "delete"]
 ```
 
-### ClusterRoleBinding
+## ClusterRoleBinding
 
 ClusterRoleBinding references a ClusterRole, but not contain it. It can 
 reference a ClusterRole in the global namespace, and adds who information 
 via Subject.
 
-#### Create
+### Create
 
 `kubectl create clusterrolebinding NAME --clusterrole=NAME [--user=username] [--group=groupname] [--serviceaccount=namespace:serviceaccountname] [--dry-run=server|client|none] [options]`
 
-#### Example
+### Example
 
 `kubectl create clusterrolebinding cluster-admin-role-binding --clusterrole=cluster-administrator --user=cluster-admin --group=group1`
 
@@ -63,15 +63,15 @@ subjects:
   name: group1
 ```
 
-### ConfigMap (cm)
+## ConfigMap (cm)
 
 ConfigMap holds configuration data for pods to consume.
 
-#### Create
+### Create
 
 `kubectl create configmap NAME [--from-file=[key=]source] [--from-literal=key1=value1] [--dry-run=server|client|none] [options]`
 
-#### Example
+### Example
 
 `kubectl create cm my-map --from-literal=foo=bar --from-literal=foo1=bar1`
 
@@ -85,15 +85,15 @@ metadata:
   name: my-map
 ```
 
-### CronJob (cj)
+## CronJob (cj)
 
 CronJob represents the configuration of a single cron job.
 
-#### Create
+### Create
 
 `kubectl create cronjob NAME --image=image --schedule='0/5 * * * ?' -- [COMMAND] [args...] [flags] [options]`
 
-#### Example
+### Example
 
 `kubectl create cj reporting-cron-job --image=reporting-tool --schedule='*/1 * * * *'`
 
@@ -106,17 +106,19 @@ spec:
   schedule: '*/1 * * * *'
   jobTemplate:
     spec:
-      completions: 3
-      parallelism: 3
+      completions: 3 # Specifies the desired number of successfully finished pods the job should be run with (https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/)
+      parallelism: 3 # Specifies the maximum desired number of pods the job should run at any given time
       template:
         spec:
           containers: 
             - name: reporting-cron-job
               image: reporting-tool
-          restartPolicy: Never
+          restartPolicy: OnFailure
 ```
 
-### Deployment
+## Deployment (deploy)
+
+Deployment enables declarative updates for Pods and ReplicaSets.
 
 Whenever new deployment is created or update a rollout process is created.
 That takes care of transition from one version to another
@@ -128,7 +130,11 @@ When rollout or rollback it creates another ReplicaSet
 and then based on `StrategyType` it destroys pods in old ReplicaSet
 and creates new pods in new ReplicaSet
 
-#### Strategy types
+### Create
+
+`kubectl create deployment NAME --image=image -- [COMMAND] [args...] [options]`
+
+### Strategy types
 
 - RollingUpdate (default)
 - Recreate
@@ -143,11 +149,19 @@ and creates new pods in new ReplicaSet
   - this way we can test it while only small portion of traffic routes to it
   - after its tested, replicas increse and old deployment is killed
 
-### Ingress
+## Ingress (ing)
 
 Ingress exposes HTTP and HTTPS routes from outside the cluster
 to services within the cluster. Traffic routing is controlled
 by rules defined on the Ingress resource.
+
+### Create
+
+`kubectl create ingress NAME --rule=host/path=service:port[,tls[=secret]] [options]`
+
+### Example
+
+`kubectl create ing minimal-ingress --class=nginx-example --rule=/testpath=test:80 --annotation=nginx.ingress.kubernetes.io/rewrite-target=/`
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -155,14 +169,20 @@ kind: Ingress
 metadata:
   name: minimal-ingress
   annotations:
+    # this annotation removes the need for a trailing slash when calling urls
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  # IngressClassName is the name of the IngressClass cluster resource.
+  # The associated IngressClass defines which controller will implement the resource.
+  # find the class name with: `kubectl get ingressclass`
   ingressClassName: nginx-example
   rules:
     - http:
         paths:
           - path: /testpath
-            pathType: Prefix
+            # Exact: Matches the URL path exactly. 
+            # Prefix: Matches based on a URL path prefix split by '/' (/foo/bar matches /foo/bar/baz, but does not match /foo/barbaz)
+            pathType: Prefix 
             backend:
               service:
                 name: test
@@ -170,13 +190,21 @@ spec:
                   number: 80
 ```
 
-### Job
+## Job
 
 Executes number of pods designed to run its instructions and the exit.
 
 Outputs of the pods will be result of the instructions
 
 Works like replicaset but it does not want the pods to live forever
+
+### Create
+
+`kubectl create job NAME --image=image [--from=cronjob/name] -- [COMMAND] [args...] [options]`
+
+### Example
+
+`kubectl create job math-add-job --image ubuntu -- expr 3 + 2`
 
 ```yaml
 apiVersion: batch/v1
@@ -190,15 +218,16 @@ spec:
   template:
     spec:
       containers: 
-        - name: math-add
+        - name: math-add-job
           image: ubuntu
           command: ['expr', '3', '+', '2']
       restartPolicy: Never
 ```
 
-### LimitRange
+## LimitRange (limits)
 
-Sets resources defaults when new Pods are created
+LimitRange sets resource usage limits for each kind of resource .
+Sets resources defaults when new Pods are created (in a Namespace)
 
 [Docs](https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-default-namespace/)
 
@@ -212,21 +241,21 @@ metadata:
 spec:
   limits:
   - default:
-      memory: 512Mi
+      memory: 512Mi # pods will have spec.containers.resources.limits.memory = 512Mi
     defaultRequest:
-      memory: 256Mi
+      memory: 256Mi # pods will have spec.containers.resources.requests.memory = 256Mi
     type: Container
 ```
 
 You can run `kubectl top` to view metrics in Pod
 
-### Namespace (ns)
+## Namespace (ns)
 
-```shell
-kubectl create ns <name>
-```
+### Create
 
-### NetworkPolicy (netpol)
+`kubectl create ns NAME`
+
+## NetworkPolicy (netpol)
 
 Pods in K8s can communicate with each other. To set restrictions, use NetworkPolicy.
 NetworkPolicy describes what network traffic is allowed for a set of Pods
@@ -275,7 +304,7 @@ spec:
           port: 80
 ```
 
-### PersistentVolume (pv)
+## PersistentVolume (pv)
 
 PersistentVolume (PV) is a storage resource provisioned by an
 administrator. It is analogous to a node. [More info](https://kubernetes.io/docs/concepts/storage/persistent-volumes)
@@ -301,10 +330,9 @@ spec:
     fsType: ext4
   # What happens to a persistent volume when released from its claim.
   persistentVolumeReclaimPolicy: Retain # Retain | Delete | Recycle
-    
 ```
 
-### PersistentVolumeClaim (pvc)
+## PersistentVolumeClaim (pvc)
 
 PersistentVolumeClaim is a user's request for and claim to a persistent volume.
 
@@ -321,7 +349,16 @@ spec:
       storage: 500Mi
 ```
 
-### Pod
+## Pod (po)
+
+### Create
+
+`kubectl run NAME --image=image [--env="key=value"] [--port=port] [--dry-run=server|client] [--overrides=inline-json]
+[--command] -- [COMMAND] [args...] [options]`
+
+**Options**
+
+- `--labels` (--labels="app=hazelcast,env=prod")
 
 ```yaml
 apiVersion: v1
@@ -404,28 +441,67 @@ spec:
         # same API as in readinessProbe
 ``` 
 
-#### Lifecycle
+### Lifecycle
 
 **Status:**
 
 Pending - ContainerCreating - Running
 
-#### Conditions
+### Conditions
 
 - PodScheduled
 - Initialized
 - ContainersReady
 - Ready
 
-### ReplicaSet (rs)
+## ReplicaSet (rs)
 
-### ResourceQuota
+## ResourceQuota (quota)
 
-### Role
+ResourceQuota sets aggregate quota restrictions enforced per namespace
 
-Creates a role object that can be used for authorization (RBAC)
-By default it has access to default namespace, but we can define
-another one in metadata section
+### Create
+
+`kubectl create quota NAME [--hard=key1=value1,key2=value2] [--scopes=Scope1,Scope2] [--dry-run=server|client|none]
+[options]`
+
+### Example
+
+`kubectl create quota my-quota --hard=cpu=1,memory=1G,pods=2,services=3,replicationcontrollers=2,resourcequotas=1,secrets=5,persistentvolumeclaims=10 --scopes=BestEffort`
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-quota
+spec:
+  hard:
+    cpu: "1"
+    memory: 1G
+    persistentvolumeclaims: "10"
+    pods: "2"
+    replicationcontrollers: "2"
+    resourcequotas: "1"
+    secrets: "5"
+    services: "3"
+  scopes:
+    - BestEffort
+```
+
+## Role
+
+Role is a namespaced, logical grouping of PolicyRules that can be 
+referenced as a unit by a RoleBinding.
+
+### Create 
+
+Create a role with single rule:
+
+`kubectl create role NAME --verb=verb --resource=resource.group/subresource [--resource-name=resourcename] [--dry-run=server|client|none] [options]`
+
+### Example
+
+`kubectl create role developer --verb=list,get,create,update,delete --resource=pods --resource-name=mypod`
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -442,94 +518,124 @@ rules:
     verbs: ["create"]
 ```
 
-#### Get roles:
-
-```shell
-kubectl get roles
-```
-
-#### Get more information about a role:
-
-```shell
-kubectl describe role <name>
-```
-
-### RoleBinding
+## RoleBinding
 
 To bind created Role to a user
+
+### Create
+
+`kubectl create rolebinding NAME --clusterrole=NAME|--role=NAME [--user=username] [--group=groupname] [--serviceaccount=namespace:serviceaccountname] [--dry-run=server|client|none] [options]`
+
+### Example
+
+`kubectl create rolebinding admin --user=admin-user --role=administrator --group=best-admins`
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: devuser-developer-binding
-subjects:
-  - kind: User
-    name: dev-user
-    apiGroup: rbac.authorization.k8s.io
+  name: admin
 roleRef:
-  kind: Role
-  name: developer
   apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: administrator
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: admin-user
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: best-admins
 ```
 
-#### Get role bindings:
+## Secret
 
-```shell
-kubectl get rolebinding
-```
+Secret holds secret data of a certain type. The total bytes of the values
+in the Data field must be less than MaxSecretSize bytes.
 
-#### Get more information about a role binding:
+### TLS secret
+#### Create 
 
-```shell
-kubectl describe rolebinding <name>
-```
+`kubectl create secret tls NAME --cert=path/to/cert/file --key=path/to/key/file [--dry-run=server|client|none] [options]`
 
-### Secret
+#### Example
 
-Encode data to use in secret:
+`kubectl create secret tls tls-secret --cert=path/to/tls.cert --key=path/to/tls.key`
 
-```shell
-echo -n 'secret' | base64
-```
+### GENERIC secret
 
-Decode hashed secrets:
+#### Create
 
-```shell
-echo -n 'c2VjcmV0' | base64 --decode
-```
+`kubectl create secret generic NAME [--type=string] [--from-file=[key=]source] [--from-literal=key1=value1] [--from-env-file=[key=]source] [--dry-run=server|client|none] [options]`
+
+#### Example
+
+`kubectl create secret generic my-secret --from-literal=key1=supersecret`
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: secret-name
+  name: my-secret
 data:
-  KEY: encodedvalue
+  key1: c3VwZXJzZWNyZXQ=
 ```
 
-### Service (svc)
+### Encode/decode strings to secret
+
+**Encode:**
+
+```shell
+echo -n 'secret' | base64
+```
+
+**Decode:**
+
+```shell
+echo -n 'c2VjcmV0' | base64 --decode
+```
+
+## Service (svc)
 
 Like a virtual server inside a node.
 It has its own IP address inside the cluster
-and that IP is called the cluster IP of the service
+
+### Create
+
+Exposing (pod, deploy):
+
+`kubectl expose (-f FILENAME | TYPE NAME) [--port=port] [--protocol=TCP|UDP|SCTP] [--target-port=number-or-name] [--name=name] [--external-ip=external-ip-of-service] [--type=type] [options]`
+
+Creating NodePort svc:
+
+`kubectl create service nodeport NAME [--tcp=port:targetPort] [--dry-run=server|client|none] [options]`
+
+Creating ClusterIP svc:
+
+`kubectl create service clusterip NAME [--tcp=<port>:<targetPort>] [--dry-run=server|client|none] [options]`
+
+### Example
+
+`kubectl create svc nodeport myapp-service --tcp=80:8080 --node-port=30008`
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: myapp-service
   name: myapp-service
 spec:
   type: NodePort
   ports:
-    - targetPort: 80 # if not provided, it is assumed to be the same as `port`
-      port: 80 # only one required
-      nodePort: 30008 # if not provided, will be allocated automatically
-  selector: # labels from the pod
-    app: myapp
+  - port: 80 # only one required
+    targetPort: 8080 # if not provided, it is assumed to be the same as `port`
+    nodePort: 30008 # if not provided, will be allocated automatically
+  selector: # labels of the pod to match
+    app: myapp-service
 ```
 
-### ServiceAccount (sa)
+### Types
 
 #### NodePort
 
@@ -537,29 +643,20 @@ Service makes an internal pod accessible on a port on a node.
 
 nodePort as a value can range between 30000 - 32767
 
-#### ClusterIP
+#### ClusterIP (default)
 
 Service creates a virtual IP inside the cluster to enable communication between different services (set of FE servers to a set of BE servers)
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: back-end
-spec:
-  type: ClusterIP # default
-  ports:
-    - targetPort: 80
-      port: 80
-  selector:
-    app: myapp
-```
 
 #### LoadBalancer
 
 Provisions a load balancer for application in supported cloud providers.
 
-### ServiceAccount
+## ServiceAccount (sa)
+
+ServiceAccount binds together: 
+- a name, understood by users, and perhaps by peripheral systems, for an identity 
+- a principal that can be authenticated and authorized 
+- a set of secrets
 
 When created, it creates ServiceAccount object and then
 generates a token for the ServiceAccount and then
@@ -569,3 +666,18 @@ for REST API requests
 
 When creating a Pod, default ServiceAccount is created for it.
 But it has limited access.
+
+### Create
+
+`kubectl create serviceaccount NAME [--dry-run=server|client|none] [options]`
+
+### Example
+
+`kubectl create serviceaccount my-service-account`
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-service-account
+```
