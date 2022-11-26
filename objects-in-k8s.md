@@ -161,7 +161,7 @@ by rules defined on the Ingress resource.
 
 ### Example
 
-`kubectl create ing minimal-ingress --class=nginx-example --rule=/testpath=test:80 --annotation=nginx.ingress.kubernetes.io/rewrite-target=/`
+`kubectl create ing minimal-ingress --class=nginx-example --rule="/testpath*=test:80" --annotation=nginx.ingress.kubernetes.io/rewrite-target=/`
 
 ```yaml
 apiVersion: networking.k8s.io/v1

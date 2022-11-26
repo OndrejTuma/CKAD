@@ -1,8 +1,22 @@
-## Commands
+# Commands
 
 See https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
 
-### Api Resources
+## Annotate
+
+Update the annotations on one or more resources.
+
+```shell
+kubectl annotate pods foo description='my frontend'
+```
+
+### Remove annotation
+
+```shell
+kubectl annotate pods foo description-
+```
+
+## Api Resources
 
 Print the supported API resources on the server. 
 You get their shortcuts and API versions as well. 
@@ -11,7 +25,7 @@ You get their shortcuts and API versions as well.
 kubectl api-resources
 ```
 
-### Auth
+## Auth
 
 Find out what authorization level current user has 
 (find out if user has access to particular resource in the cluster)
@@ -22,14 +36,28 @@ kubectl auth can-i create deployments
 kubectl auth can-i delete nodes
 ```
 
-#### Find out permissions for other users
+### Find out permissions for other users
 
 ```shell
 kubectl auth can-i <action> <object> --as <user>
 kubectl auth can-i create pods --as dev-user
 ```
 
-### Config
+## Autoscale
+
+Creates an autoscaler that automatically chooses and sets the number of pods that run in a Kubernetes cluster.
+
+Looks up a deployment, replica set, stateful set, or replication controller by name and creates an autoscaler that uses
+the given resource as a reference. An autoscaler can automatically increase or decrease number of pods deployed within
+the system as needed.
+
+### Auto scale a deployment "foo", with the number of pods between 2 and 10, target CPU utilization at 80%
+
+```sh
+kubectl autoscale deployment foo --min=2 --max=10 --cpu-percent=80
+```
+
+## Config
 
 Config hold info about clusters in a kubernetes system and accounts created.
 Contexts connect user account to cluster.
@@ -38,21 +66,21 @@ that will be automatically used when the context is used
 
 Default config is located at `~/.kube/config`
 
-#### See default config file:
+### See default config file:
 
 ```shell
 kubectl config view
 ```
 
-#### Change context:
+### Change context:
 
 ```shell
 kubectl config use-context <context-name>
 ```
 
-### Create
+## Create
 
-#### From a command (imperative)
+### From a command (imperative)
 
 ```sh
 kubectl create <object> <name> [options]
@@ -68,19 +96,19 @@ Options:
   - `--from-literal=<key>=<value>` declarable multiple times 
   - `--from-file=<path-to-file>`
 
-#### From a file (declarative)
+### From a file (declarative)
 
 ```shell
 kubectl create -f definition.yml
 ```
 
-### Describe
+## Describe
 
 ```shell
 kubectl describe <object> <name>
 ```
 
-### Edit
+## Edit
 
 Edit existing object, results are immediately applied.
 
@@ -95,7 +123,7 @@ You can edit only limited number of things in a Pod.
 - spec.activeDeadlineSeconds
 - spec.tolerations
 
-### Exec
+## Exec
 
 Runs command from inside a Pod
 
@@ -103,7 +131,7 @@ Runs command from inside a Pod
 kubectl exec -it <pod-name> <command>
 ```
 
-### Explain
+## Explain
 
 Shows definition of object, useful for quick
 look of how to define objects in definition file. 
@@ -113,18 +141,18 @@ Also, you can find to which API group this object (resource) belongs
 kubectl explain <object[.<key>]> [options] 
 ```
 
-#### Options
+### Options
 
 - `--recursive` - shows all definitions
 
-#### Example
+### Example
 
 ```shell
 kubectl explain pods --recursive | less
 kubectl explain pods --recursive | grep envFrom -A3
 ```
 
-### Expose
+## Expose
 
 Expose a resource as a new Kubernetes service.
 
@@ -145,19 +173,19 @@ will re-use the labels from the resource it exposes.
 kubectl expose deployment webapp-deployment --name=webapp-service --target-port=8080 --type=NodePort --port=8080
 ```
 
-### Get
+## Get
 
 ```shell
 kubectl get <object> [options]
 ```
 
-#### Options
+### Options
 
 - `--selector, -l <key>=<value>,<key2>=<value2>`
 - `--namespace, -n`
 - `--show-labels`
 
-#### Example
+### Example
 
 Get number of pods in dev env
 
@@ -165,7 +193,7 @@ Get number of pods in dev env
 kubectl get pods -l env=dev --no-headers | wc -l
 ```
 
-### Label
+## Label
 
 Label Node so that we can target which Pods will be placed into it (via `nodeSelector` in Pod definition)
 More granular approach grant Node Affinity
@@ -174,14 +202,14 @@ More granular approach grant Node Affinity
 kubectl label node <node-name> <label-key>=<label-value>
 ```
 
-#### Example
+### Example
 
 ```shell
 kubectl label node node1 size=Large
 ```
 
 
-### Logs
+## Logs
 
 Show logs from a POD. Can target specific container in the POD
 
@@ -189,14 +217,14 @@ Show logs from a POD. Can target specific container in the POD
 kubectl logs <pod-name> [<pod-container>] [options]
 ```
 
-#### Options
+### Options
 
 - `-c, --container <container>`
   - show logs for specific container
 - `-f, --follow` 
   - stream the logs
 
-### Options
+## Options
 
 Show list of global command-line options (applies to all commands)
 
@@ -204,7 +232,7 @@ Show list of global command-line options (applies to all commands)
 kubectl options
 ```
 
-### Proxy
+## Proxy
 
 Proxy default kube api server with default credentials from kube config.
 The server will be exposed at a port `8001` and you can start curling the 
@@ -214,21 +242,21 @@ server without setting up `--key` `--cert` and `--cacert`
 kubectl proxy
 ```
 
-### Replace
+## Replace
 
 Replace running object with definition file
 
-#### From a file
+### From a file
 
 ```sh
 kubectl replace -f definition.yml
 ```
 
-### Rollout
+## Rollout
 
 Rollout command of deployment.
 
-#### History
+### History
 
 Shows history of rollouts for deployment
 
@@ -241,7 +269,7 @@ Options:
 - `--revision` - check the status of each revision individually
 
 
-#### Status
+### Status
 
 Shows status of current rollout
 
@@ -249,7 +277,7 @@ Shows status of current rollout
 kubectl rollout status deployment <name>
 ```
 
-#### Undo
+### Undo
 
 Rollback of deployment
 
@@ -257,13 +285,13 @@ Rollback of deployment
 kubectl rollout undo deployment <name>
 ```
 
-### Run
+## Run
 
 ```shell
 kubectl run <name> --image=<image> [options]
 ```
 
-#### Options
+### Options
 
 - `--env="<key>=<value>"`
   - Environment variables to set in the container
@@ -276,13 +304,13 @@ kubectl run <name> --image=<image> [options]
 - `--port=<port>`
   - The port that this container exposes
 
-### Set
+## Set
 
 ```shell
 kubectl set <subcommand> <object> <name> <key>=<value> [options]
 ```
 
-#### subcommand
+### subcommand
 
 - `env` - Update environment variables on a pod template
 - `image` - Update the image of a pod template
@@ -295,11 +323,11 @@ kubectl set <subcommand> <object> <name> <key>=<value> [options]
 
 > TODO: play with set's capabilities and update this document accordingly
 
-#### Options
+### Options
 
 - `--record` - record what is being done. Useful for `rollout history`
 
-#### Examples
+### Examples
 
 Update image in the deployment to `nginx:1.17` and record it.
 It will be shown in CHANGE-CAUSE column for `rollout history` command  
@@ -308,19 +336,19 @@ It will be shown in CHANGE-CAUSE column for `rollout history` command
 kubectl set image deployment nginx nginx=nginx:1.17 --record
 ```
 
-### Scale
+## Scale
 
 Commands to use when we want to increase number of replicas.
 
 Can be used on replicasets and deployments
 
-#### From a file
+### From a file
 
 ```sh
 kubectl scale --replicas=<number> -f definition.yml
 ```
 
-#### From running object
+### From running object
 
 `<object>` - replicaset, deployment, etc.
 
@@ -328,7 +356,7 @@ kubectl scale --replicas=<number> -f definition.yml
 kubectl scale <object> <name> --replicas=<number>
 ```
 
-### Taint
+## Taint
 
 Taint node so that only Pods with **toleration** will be placed into it
 
@@ -341,7 +369,7 @@ kubectl taint node <node-name> key=value:taint-effect
     - `PreferNoSchedule` - try not to place Pods into the node, but no guarantee
     - `NoExecute` - like NoSchedule, but even existing Pods will be evicted if they don't tolerate the taint
 
-#### Example
+### Example
 
 Taint a node
 
@@ -355,7 +383,7 @@ Untaint a node (mind the dash)
 kubectl taint node node1 app=blue:NoSchedule-
 ```
 
-### Top
+## Top
 
 Get resources of object (typically Pod)
 
